@@ -1,6 +1,6 @@
 const cols = document.querySelectorAll('.col');
 
-setRandomColors();
+setRandomColors(true);
 
 document.addEventListener('keydown', event => {
     event.preventDefault();
@@ -11,7 +11,6 @@ document.addEventListener('keydown', event => {
 
 document.addEventListener('click', event => {
     const type = event.target.dataset.type;
-    console.log(type);
     if (type === 'lock') {
         const node = event.target.tagName.toLowerCase() === 'i' 
             ? event.target
@@ -35,22 +34,29 @@ function generateRandomColor() {
     return '#' + color;
 }
 
-function setRandomColors() {
-    const colors = [];
+function setRandomColors(isInitial) {
 
-    cols.forEach(col => {
+    const colors = isInitial ? getColorsFromHash() : [];
+
+    cols.forEach((col, idx) => {
         const isLocked = col.querySelector('i').classList.contains('fa-lock');
         const text = col.querySelector('h2');
         const btn = col.querySelector('button');
-        const color = chroma.random();
-
-    
+        
         if (isLocked) {
             colors.push(text.textContent);
             return;
         }
 
-        colors.push(color);
+        const color = isInitial 
+            ? colors[idx]
+                ? colors[idx]
+                : chroma.random() 
+            : chroma.random();
+
+        if (!isInitial) {
+            colors.push(color);
+        }
         
         setTextColor(text, color);
         setTextColor(btn, color);
@@ -73,5 +79,17 @@ function copyToClipboard(text) {
 }
 
 function updateColorsHash(colors = []) {
-    document.location.hash = colors.toString();
+    document.location.hash = colors.map(col => col.toString().substring(1))
+    .join('-')
+}
+
+function getColorsFromHash() {
+    if (document.location.hash.length > 1) {
+        return document.location.hash
+            .substring(1)
+            .split('-')
+            .map((color) =>  '#' + color)
+        }
+
+    return [];
 }
