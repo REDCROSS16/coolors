@@ -43,9 +43,14 @@ function setRandomColors() {
         const text = col.querySelector('h2');
         const btn = col.querySelector('button');
         const color = chroma.random();
-        
+
     
-        if (isLocked) return;
+        if (isLocked) {
+            colors.push(text.textContent);
+            return;
+        }
+
+        colors.push(color);
         
         setTextColor(text, color);
         setTextColor(btn, color);
@@ -53,6 +58,8 @@ function setRandomColors() {
         text.textContent = color;
         col.style.background = color;
     })
+
+    updateColorsHash(colors);
 }
 
 function setTextColor(text, color) {
